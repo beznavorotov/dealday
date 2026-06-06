@@ -21,7 +21,7 @@ export async function signIn(email: string, password: string) {
   if (!data.session) {
     return {
       success: false,
-      error: "Сесію не створено. Перевірте налаштування Supabase Auth.",
+      error: "Сесію не створено.",
     };
   }
 
@@ -30,7 +30,7 @@ export async function signIn(email: string, password: string) {
   };
 }
 
-export async function signOut() {
+export async function signOutAction() {
   const supabase = await createClient();
 
   await supabase.auth.signOut();

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { signOut } from "@/lib/actions/auth";
+import { signOutAction } from "@/lib/actions/auth";
 import { SITE_NAME } from "@/lib/constants";
 
 export default function AdminHeader() {
@@ -32,12 +32,7 @@ export default function AdminHeader() {
           </nav>
         </div>
 
-        <form
-          action={async () => {
-            "use server";
-            await signOut();
-          }}
-        >
+        <form action={signOutAction}>
           <button
             type="submit"
             className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600"
