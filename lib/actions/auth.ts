@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signIn(email: string, password: string) {
@@ -11,15 +13,17 @@ export async function signIn(email: string, password: string) {
   });
 
   if (error) {
-    return { success: false, error: error.message };
+    return { error: error.message };
   }
 
-  return { success: true };
+  revalidatePath("/admin");
+  redirect("/admin");
 }
 
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
 
-  return { success: true };
+  revalidatePath("/login");
+  redirect("/login");
 }

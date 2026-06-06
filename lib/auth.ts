@@ -1,19 +1,22 @@
-"use server";
-
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function signIn(email: string, password: string) {
+export async function getUser() {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (error) {
-    return { error: error.message };
+  return user;
+}
+
+export async function requireUser() {
+  const user = await getUser();
+
+  if (!user) {
+    redirect("/login");
   }
 
-  redirect("/admin");
+  return user;
 }
