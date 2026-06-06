@@ -32,7 +32,12 @@ export default function AdminHeader() {
           </nav>
         </div>
 
-        <form action={signOut}>
+        <form
+          action={async () => {
+            "use server";
+            await signOut();
+          }}
+        >
           <button
             type="submit"
             className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600"

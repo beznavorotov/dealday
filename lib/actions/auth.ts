@@ -1,29 +1,39 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signIn(email: string, password: string) {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
   if (error) {
-    return { error: error.message };
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 
-  revalidatePath("/admin");
-  redirect("/admin");
+  if (!data.session) {
+    return {
+      success: false,
+      error: "Сесію не створено. Перевірте налаштування Supabase Auth.",
+    };
+  }
+
+  return {
+    success: true,
+  };
 }
 
 export async function signOut() {
   const supabase = await createClient();
+
   await supabase.auth.signOut();
 
-  revalidatePath("/login");
   redirect("/login");
 }
