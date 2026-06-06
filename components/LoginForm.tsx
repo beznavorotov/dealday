@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/actions/auth";
 
 export default function LoginForm() {
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,10 +19,15 @@ export default function LoginForm() {
     const password = form.get("password") as string;
 
     const result = await signIn(email, password);
+
     if (result?.error) {
       setError(result.error);
       setLoading(false);
+      return;
     }
+
+    router.push("/admin");
+    router.refresh();
   }
 
   return (
@@ -46,10 +53,7 @@ export default function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-zinc-700"
-        >
+        <label htmlFor="password" className="block text-sm font-medium text-zinc-700">
           Пароль
         </label>
         <input
