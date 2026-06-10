@@ -13,6 +13,9 @@ function parseDisplayOrder(value: number): number {
 }
 
 function toCreatePayload(formData: StoreFormData) {
+  const dealStart = formData.deal_start_date || todayIsoDate();
+  const dealEnd = formData.deal_end_date || dealStart;
+
   return {
     name: formData.name.trim(),
     category: formData.category,
@@ -20,18 +23,26 @@ function toCreatePayload(formData: StoreFormData) {
     logo_url: formData.logo_url.trim() || null,
     product_url: formData.product_url || null,
     is_deal_active: formData.is_deal_active,
-    deal_date: formData.is_deal_active ? todayIsoDate() : null,
+    deal_date: dealStart,
+    deal_start_date: dealStart,
+    deal_end_date: dealEnd,
     display_order: parseDisplayOrder(formData.display_order),
   };
 }
 
-function toDealUpdatePayload(formData: StoreFormData) {
+function toUpdatePayload(formData: StoreFormData) {
+  const dealStart = formData.deal_start_date || todayIsoDate();
+  const dealEnd = formData.deal_end_date || dealStart;
+
   return {
+    category: formData.category,
     image_url: formData.image_url,
     logo_url: formData.logo_url.trim() || null,
     product_url: formData.product_url || null,
     is_deal_active: formData.is_deal_active,
-    deal_date: formData.is_deal_active ? todayIsoDate() : null,
+    deal_date: dealStart,
+    deal_start_date: dealStart,
+    deal_end_date: dealEnd,
     display_order: parseDisplayOrder(formData.display_order),
   };
 }
@@ -103,7 +114,7 @@ export async function updateStore(id: string, formData: StoreFormData) {
   const supabase = await requireAuth();
   const { error } = await supabase
     .from("stores")
-    .update(toDealUpdatePayload(formData))
+    .update(toUpdatePayload(formData))
     .eq("id", id);
 
   if (error) throw new Error(error.message);
@@ -136,10 +147,7 @@ export async function toggleDealActive(id: string, isActive: boolean) {
   const supabase = await requireAuth();
   const { error } = await supabase
     .from("stores")
-    .update({
-      is_deal_active: isActive,
-      deal_date: isActive ? todayIsoDate() : null,
-    })
+    .update({ is_deal_active: isActive })
     .eq("id", id);
 
   if (error) throw new Error(error.message);

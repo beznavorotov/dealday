@@ -26,3 +26,16 @@ export function formatDateUk(dateStr: string): string {
 
   return `${day} ${month} ${year} р.`;
 }
+
+export function formatDealPeriod(start: string, end: string): string {
+  if (start === end) {
+    return `Діє: ${formatDateUk(start)}`;
+  }
+
+  const startDate = new Date(`${start}T00:00:00`);
+  const endDate = new Date(`${end}T00:00:00`);
+  const startPart = `${startDate.getDate()} ${months[startDate.getMonth()]}`;
+  const endPart = `${endDate.getDate()} ${months[endDate.getMonth()]} ${endDate.getFullYear()} р.`;
+
+  return `Діє: ${startPart} — ${endPart}`;
+}

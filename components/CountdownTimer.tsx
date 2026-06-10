@@ -1,54 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+import {
+  formatCountdown,
+  getEndOfDealDayMs,
+} from "@/lib/utils/deal";
 
-function getTimeLeft() {
-  const now = new Date();
-  const endOfDay = new Date();
-
-  endOfDay.setHours(23, 59, 59, 999);
-
-  const diff = endOfDay.getTime() - now.getTime();
-
-  if (diff <= 0) return "00:00:00";
-
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-  const seconds = Math.floor((diff / 1000) % 60);
-
-  return [hours, minutes, seconds]
-    .map((value) => String(value).padStart(2, "0"))
-    .join(":");
+interface CountdownTimerProps {
+  nearestEndDate: string | null;
 }
 
-export default function CountdownTimer() {
-  const [mounted, setMounted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState("00:00:00");
+function subscribe(onStoreChange: () => void) {
+  const interval = setInterval(onStoreChange, 1000);
+  return () => clearInterval(interval);
+}
 
-  useEffect(() => {
-    setMounted(true);
-    setTimeLeft(getTimeLeft());
+function getServerSnapshot() {
+  return 0;
+}
 
-    const interval = setInterval(() => {
-      setTimeLeft(getTimeLeft());
-    }, 1000);
+export default function CountdownTimer({ nearestEndDate }: CountdownTimerProps) {
+  const now = useSyncExternalStore(subscribe, () => Date.now(), getServerSnapshot);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!mounted) {
+  if (!nearestEndDate) {
     return (
-      <span className="inline-flex items-center rounded-full bg-orange-50 px-3 py-1.5 text-xs text-orange-600">
-        до кінця дня&nbsp;
-        <strong className="font-mono text-orange-700">--:--:--</strong>
+      <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1.5 text-xs text-zinc-600">
+        Акції очікуються
+      </span>
+    );
+  }
+
+  const diff = getEndOfDealDayMs(nearestEndDate) - now;
+
+  if (diff <= 0) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1.5 text-xs text-zinc-600">
+        Акції очікуються
       </span>
     );
   }
 
   return (
     <span className="inline-flex items-center rounded-full bg-orange-50 px-3 py-1.5 text-xs text-orange-600">
-      до кінця дня&nbsp;
-      <strong className="font-mono text-orange-700">{timeLeft}</strong>
+      Найближча акція завершується через&nbsp;
+      <strong className="font-mono text-orange-700">
+        {formatCountdown(diff)}
+      </strong>
     </span>
   );
 }

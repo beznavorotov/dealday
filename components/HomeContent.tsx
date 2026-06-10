@@ -4,6 +4,10 @@ import { useMemo, useState } from "react";
 import CountdownTimer from "@/components/CountdownTimer";
 import CategoryFilter from "@/components/CategoryFilter";
 import ProductCard from "@/components/ProductCard";
+import {
+  getNearestActiveDealEndDate,
+  isStoreDealActive,
+} from "@/lib/utils/deal";
 import type { Store } from "@/types/store";
 
 interface HomeContentProps {
@@ -19,7 +23,12 @@ export default function HomeContent({ stores }: HomeContentProps) {
   }, [stores, selectedCategory]);
 
   const activeCount = useMemo(
-    () => stores.filter((s) => s.is_deal_active && s.product_url).length,
+    () => stores.filter((store) => isStoreDealActive(store)).length,
+    [stores]
+  );
+
+  const nearestEndDate = useMemo(
+    () => getNearestActiveDealEndDate(stores),
     [stores]
   );
 
@@ -58,7 +67,7 @@ export default function HomeContent({ stores }: HomeContentProps) {
         </>
       )}
 
-      <CountdownTimer />
+      <CountdownTimer nearestEndDate={nearestEndDate} />
     </div>
   </div>
 </section>

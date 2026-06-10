@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import StoreLogo from "@/components/StoreLogo";
 import { deleteStore, toggleDealActive } from "@/lib/actions/stores";
-import { formatDateUk } from "@/lib/utils/date";
+import {
+  getDealStatusLabel,
+  getDealVisualStatus,
+  isStoreDealActive,
+} from "@/lib/utils/deal";
+import { formatDealPeriod } from "@/lib/utils/date";
 import type { Store } from "@/types/store";
 
 interface AdminStoreTableProps {
@@ -67,14 +72,24 @@ export default function AdminStoreTable({ stores }: AdminStoreTableProps) {
               <th className="px-4 py-3 font-semibold text-zinc-700">Логотип</th>
               <th className="px-4 py-3 font-semibold text-zinc-700">Назва</th>
               <th className="px-4 py-3 font-semibold text-zinc-700">Категорія</th>
-              <th className="px-4 py-3 font-semibold text-zinc-700">Дата товару</th>
+              <th className="px-4 py-3 font-semibold text-zinc-700">Період акції</th>
               <th className="px-4 py-3 font-semibold text-zinc-700">Статус</th>
               <th className="px-4 py-3 font-semibold text-zinc-700">Кліки</th>
               <th className="px-4 py-3 font-semibold text-zinc-700">Дії</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
-            {stores.map((store) => (
+            {stores.map((store) => {
+              const visuallyActive = isStoreDealActive(store);
+              const statusLabel = getDealStatusLabel(getDealVisualStatus(store));
+              const dealPeriod =
+                store.deal_start_date && store.deal_end_date
+                  ? formatDealPeriod(store.deal_start_date, store.deal_end_date)
+                  : store.deal_date
+                    ? formatDealPeriod(store.deal_date, store.deal_date)
+                    : "—";
+
+              return (
               <tr key={store.id} className="hover:bg-zinc-50/50">
                 <td className="px-4 py-3">
                   <StoreLogo
@@ -87,9 +102,7 @@ export default function AdminStoreTable({ stores }: AdminStoreTableProps) {
                   {store.name}
                 </td>
                 <td className="px-4 py-3 text-zinc-600">{store.category}</td>
-                <td className="px-4 py-3 text-zinc-600">
-                  {store.deal_date ? formatDateUk(store.deal_date) : "—"}
-                </td>
+                <td className="px-4 py-3 text-zinc-600">{dealPeriod}</td>
                 <td className="px-4 py-3">
                   <button
                     type="button"
@@ -98,16 +111,12 @@ export default function AdminStoreTable({ stores }: AdminStoreTableProps) {
                       handleToggle(store.id, store.is_deal_active)
                     }
                     className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-50 ${
-                      store.is_deal_active
+                      visuallyActive
                         ? "bg-green-100 text-green-700 hover:bg-green-200"
                         : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                     }`}
                   >
-                    {togglingId === store.id
-                      ? "..."
-                      : store.is_deal_active
-                        ? "Активний"
-                        : "Неактивний"}
+                    {togglingId === store.id ? "..." : statusLabel}
                   </button>
                 </td>
                 <td className="px-4 py-3 text-zinc-600">{store.clicks ?? 0}</td>
@@ -130,7 +139,8 @@ export default function AdminStoreTable({ stores }: AdminStoreTableProps) {
                   </div>
                 </td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>

@@ -35,8 +35,7 @@ export default async function EditStorePage({ params }: EditStorePageProps) {
           Редагувати: {store.name}
         </h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Оновіть товар дня: картинку, посилання, статус і дату. Назва та
-          категорія задаються один раз при створенні.
+          Оновіть акцію: категорію, картинку, посилання, дати та статус.
         </p>
       </div>
 

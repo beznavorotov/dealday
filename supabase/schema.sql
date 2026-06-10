@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS stores (
   product_url TEXT,
   is_deal_active BOOLEAN NOT NULL DEFAULT false,
   deal_date DATE,
+  deal_start_date DATE,
+  deal_end_date DATE,
   display_order INTEGER NOT NULL DEFAULT 0,
   clicks INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

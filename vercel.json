@@ -1,8 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/deactivate-deals",
-      "schedule": "59 20 * * *"
-    }
-  ]
-}
+{}

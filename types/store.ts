@@ -20,6 +20,8 @@ export interface Store {
   product_url: string | null;
   is_deal_active: boolean;
   deal_date: string | null;
+  deal_start_date: string | null;
+  deal_end_date: string | null;
   display_order: number;
   clicks: number;
   created_at: string;
@@ -33,5 +35,7 @@ export interface StoreFormData {
   logo_url: string;
   product_url: string;
   is_deal_active: boolean;
+  deal_start_date: string;
+  deal_end_date: string;
   display_order: number;
 }
